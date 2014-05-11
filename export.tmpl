@@ -1,0 +1,27 @@
+{{define "Unit"}}
+_unit = _group createUnit ["{{.Classname}}", [{{index .Position 0}},{{index .Position 1}},{{index .Position 2}}], [], {{if .Placement}}{{.Placement}}{{else}}0{{end}}, "{{if .Special}}{{.Special}}{{else}}NONE{{end}}"];
+_unit setPos [{{index .Position 0}},{{index .Position 1}},{{index .Position 2}}];
+{{if .Init}}_unit setVehicleInit "{{.Init}}";{{end}}
+
+{{end}}
+
+{{define "Waypoint"}}
+_wp = _group addWaypoint [[{{index .Position 0}},{{index .Position 1}},{{index .Position 2}}], 0];
+_wp setWaypointType "{{.Type}}";
+_wp setWaypointCombatMode "RED";
+_wp setWaypointBehaviour "AWARE";
+_wp setWaypointTimeout [5, 10, 6];
+{{end}}
+
+{{define "Group"}}
+_group = createGroup {{.Side}};
+{{range .Units}}{{template "Unit" .}}{{end}}
+{{range .Waypoints}}{{template "Waypoint"}}{{end}}
+_groups = _groups + [_group]
+{{end}}
+
+
+_groups = []
+{{range .Groups}}{{if (exportGroup .)}}{{template "Group" .}}{{end}}{{end}}
+processInitCommands;
+_groups //return
